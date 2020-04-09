@@ -14,5 +14,10 @@ passport.use(
     }, githubLoginCallback)
 );
 
-passport.serializeUser(User.serializeUser((user, done) => done(null, user)));
-passport.deserializeUser(User.deserializeUser((user, done) => done(null, user)));
+passport.serializeUser(function(user,done) {
+    done(null, user);
+});
+
+passport.deserializeUser(function(user,done) {
+    done(null, user);
+});

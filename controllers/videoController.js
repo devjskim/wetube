@@ -1,11 +1,13 @@
 import routes from "../routes";
-import Video from "../models/Video"
+import Video from "../models/Video";
+import User from "../models/User";
 import bodyParser from "body-parser";
 
 export const home = async(req, res) => {
     try{
         const videos = await Video.find({}).sort({_id:-1});
         res.render("home", {pageTitle: "Home", videos});
+        console.log(loggedUser);
     } catch(error){
         console.log(error);
         res.render("home", {pageTitle: "Home", videos: []});
@@ -43,14 +45,19 @@ export const postUpload = async(req, res) => {
         },
         file: {path}
     } = req;
+    //const user = await User.findById(req.user._id);
     const newVideo = await Video.create({
         fileUrl: path,
         title,
         description,
+        creator: req.user.id
     });
+    console.log(req);
+    req.user.videos.push(newVideo._id);
+    req.user.save();
+    //req.user.save();
     // ToDO: upload and save video
     res.redirect(routes.videoDetail(newVideo.id));
-    
 };
 
 export const videoDetail = async(req, res) => {
@@ -58,14 +65,12 @@ export const videoDetail = async(req, res) => {
         params: {id}
     } = req;
     try{
-        const video = await Video.findById(id);
+        const video = await Video.findById(id).populate('creator');
         //console.log(video);
         res.render("videoDetail", {pageTitle: video.title, video});
     }   catch{
         res.redirect(routes.home);
     }
-    
-    
 };
 
 export const getEditVideo = async(req, res) => {

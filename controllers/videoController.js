@@ -7,7 +7,6 @@ export const home = async(req, res) => {
     try{
         const videos = await Video.find({}).sort({_id:-1});
         res.render("home", {pageTitle: "Home", videos});
-        console.log(loggedUser);
     } catch(error){
         console.log(error);
         res.render("home", {pageTitle: "Home", videos: []});
@@ -45,25 +44,26 @@ export const postUpload = async(req, res) => {
         },
         file: {path}
     } = req;
-    //const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id);
     const newVideo = await Video.create({
         fileUrl: path,
         title,
         description,
-        creator: req.user.id
+        creator: req.user._id
     });
-    console.log(req);
-    req.user.videos.push(newVideo._id);
-    req.user.save();
-    //req.user.save();
+    
+    user.videos.push(newVideo._id);
+    user.save;
+    
     // ToDO: upload and save video
-    res.redirect(routes.videoDetail(newVideo.id));
+    res.redirect(routes.videoDetail(newVideo._id));
 };
 
 export const videoDetail = async(req, res) => {
     const {
         params: {id}
     } = req;
+    console.log(req);
     try{
         const video = await Video.findById(id).populate('creator');
         //console.log(video);
